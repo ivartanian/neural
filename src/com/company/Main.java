@@ -6,11 +6,16 @@ public class Main {
 
         double i1 = 1, i2 = 0, w1 = 0.45, w2 = 0.78, w3 = -0.12, w4 = 0.13, w5 = 1.5, w6 = -2.3;
 
-        double result = calculate(i1, i2, w1, w2, w3, w4, w5, w6);
+        calculate(1, i1, i2, w1, w2, w3, w4, w5, w6);
 
     }
 
-    private static double calculate(double i1, double i2, double w1, double w2, double w3, double w4, double w5, double w6) {
+    private static void calculate(int iteration, double i1, double i2, double w1, double w2, double w3, double w4, double w5, double w6) {
+
+        if (iteration > 1){
+            return;
+        }
+
         double h1input = i1 * w1 + i2 * w3;
         double h1output = sigmoid(h1input);
 
@@ -24,7 +29,23 @@ public class Main {
 
         double error = Math.pow(o1ideal - o1output, 2) / 1;
 
-        return o1output;
+        double qO1H1 = morO(o1output, o1ideal);
+        double qH1 = mor(h1output, o1ideal, w5, qO1H1);
+        double gradW5 = grad(h1output, qO1H1);
+        w5 = w5 + getWeight(iteration, w5, gradW5);
+
+        double qO1H2 = morO(o1output, o1ideal);
+        double qH2 = mor(h2output, o1ideal, w6, qO1H2);
+        double gradW6 = grad(h2output, qO1H2);
+        w6 = w6 + getWeight(iteration, w6, gradW6);
+
+        double gradW1 = grad(i1, qH1);
+        w1 = w1 + getWeight(iteration, w1, gradW1);
+        double gradW2 = grad(i1, qH2);
+        w2 = w2 + getWeight(iteration, w2, gradW2);
+        System.out.println(w2);
+
+        calculate(++iteration, i1, i2, w1, w2, w3, w4, w5, w6);
     }
 
     private static double sigmoid(double input) {
